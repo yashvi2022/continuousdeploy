@@ -37,5 +37,6 @@ jobs:
     # 5. Deploy to Kubernetes
     - name: Deploy manifests
       run: |
-        kubectl --insecure-skip-tls-verify=true set image deployment/react-app react-app=acryashvi.azurecr.io/react-app:v1
+        kubectl --insecure-skip-tls-verify set image deployment/react-app react-app=acryashvi.azurecr.io/react-app:v1
         kubectl rollout status deployment/react-app
+    
