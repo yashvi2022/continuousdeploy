@@ -29,13 +29,10 @@ jobs:
     # 4. Connect to Kubernetes cluster
     - name: Set up kubeconfig
       run: |
-        az vm run-command invoke \
-          --resource-group rg-yashvi \
-          --name master \
-          --command-id RunShellScript \
-          --scripts "cat /home/azureuser/.kube/config" > kubeconfig.yaml
-        mkdir -p ~/.kube
-        cat kubeconfig.yaml | tail -n +5 > ~/.kube/config
+       mkdir -p ~/.kube
+       echo "${{ secrets.KUBECONFIG_B64 }}" | base64 -d > ~/.kube/config
+       chmod 600 ~/.kube/config
+
 
     # 5. Deploy to Kubernetes
     - name: Deploy manifests
