@@ -31,7 +31,7 @@ jobs:
       run: |
         az vm run-command invoke \
           --resource-group ${{ secrets.RESOURCE_GROUP }} \
-          --name ${{ secrets.MASTER_VM_NAME }} \
+          --name ${{ secrets.MASTER }} \
           --command-id RunShellScript \
           --scripts "cat /home/azureuser/.kube/config" > kubeconfig.yaml
         mkdir -p ~/.kube
