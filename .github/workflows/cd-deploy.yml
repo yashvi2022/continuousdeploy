@@ -24,14 +24,14 @@ jobs:
     # 3. Log in to Azure Container Registry (ACR)
     - name: Log in to ACR
       run: |
-        az acr login --name ${{ secrets.ACR_NAME }}
+        az acr login --name acryashvi
 
     # 4. Connect to Kubernetes cluster
     - name: Set up kubeconfig
       run: |
         az vm run-command invoke \
-          --resource-group ${{ secrets.RESOURCE_GROUP }} \
-          --name ${{ secrets.MASTER }} \
+          --resource-group rg-yashvi \
+          --name master \
           --command-id RunShellScript \
           --scripts "cat /home/azureuser/.kube/config" > kubeconfig.yaml
         mkdir -p ~/.kube
