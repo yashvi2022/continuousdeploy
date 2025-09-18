@@ -1,0 +1,44 @@
+name: CD Pipeline - Deploy to Kubernetes
+
+on:
+  workflow_dispatch:   # Manual trigger
+  push:
+    branches:
+      - main           # Runs on push to main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Checkout repo (optional: if manifests are inside repo)
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    # 2. Log in to Azure using Service Principal
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    # 3. Log in to Azure Container Registry (ACR)
+    - name: Log in to ACR
+      run: |
+        az acr login --name ${{ secrets.ACR_NAME }}
+
+    # 4. Connect to Kubernetes cluster
+    - name: Set up kubeconfig
+      run: |
+        az vm run-command invoke \
+          --resource-group ${{ secrets.RESOURCE_GROUP }} \
+          --name ${{ secrets.MASTER_VM_NAME }} \
+          --command-id RunShellScript \
+          --scripts "cat /home/azureuser/.kube/config" > kubeconfig.yaml
+        mkdir -p ~/.kube
+        cat kubeconfig.yaml | tail -n +5 > ~/.kube/config
+
+    # 5. Deploy to Kubernetes
+    - name: Deploy manifests
+      run: |
+        kubectl set image deployment/react-app react-app=${{ secrets.ACR_NAME }}.azurecr.io/react-app:v1 --record
+        kubectl rollout status deployment/react-app
